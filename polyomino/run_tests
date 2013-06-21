@@ -1,0 +1,6 @@
+#!/bin/bash
+./testDList.exe
+./testCell.exe
+./testShapes.exe
+./testBoard.exe
+./testStateSpace.exe
