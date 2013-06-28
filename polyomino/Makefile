@@ -49,14 +49,14 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 # Build test files
 testCell.exe : testCell.o Shapes.o gtest.a gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
 
 testShapes.exe : testShapes.o Shapes.o gtest.a gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
 
 testBoard.exe : testBoard.o Board.o Shapes.o gtest.a gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
 
 testStateSpace.exe : testStateSpace.o StateSpace.o Board.o Shapes.o gtest.a gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
 
