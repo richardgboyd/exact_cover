@@ -1,6 +1,13 @@
 #include "stdio.h"
 #include "limits.h"
+#if defined(__cplusplus)
+extern "C" {
+#endif
+#include "dlist.h"
 #include "exact_cover.h"
+#if defined(__cplusplus)
+}
+#endif
 
 /**
  * Utility functions to make the exact cover objects easier
