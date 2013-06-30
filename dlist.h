@@ -1,6 +1,8 @@
 #ifndef DLIST_HEADER
 #define DLIST_HEADER
 
+#include "stddef.h"
+
 /**
  * The dlist stucture that must be contained in the structure which will
  * be used for dlist linking.
