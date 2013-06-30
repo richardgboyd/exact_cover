@@ -1,7 +1,7 @@
-//#include "stdio.h"
-//#include "stdlib.h"
 #include "gtest/gtest.h"
+extern "C" {
 #include "dlist.h"
+}
 
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof((a)[0]))
 
@@ -44,7 +44,7 @@ static bool testDListLink(
 /**
  * Test that the nodes initialize the way we expect
  */
-TEST(dlist, init)
+TEST(DList, init)
 {
    struct dlist value;
 
@@ -58,7 +58,7 @@ TEST(dlist, init)
  * Test the isEmpty operation
  */
 //void unitTest_dlistIsEmpty(void)
-TEST(dlist, isEmpty)
+TEST(DList, isEmpty)
 {
    struct dlist nodes[2];
 
@@ -74,8 +74,7 @@ TEST(dlist, isEmpty)
 /**
  * Test that get object returns the correct address for the dlist object pointer
  */
-//void unitTest_dlistGetObject(void)
-TEST(dlist, getObject)
+TEST(DList, getObject)
 {
    int errors = 0;
    struct node a;
@@ -96,8 +95,7 @@ TEST(dlist, getObject)
  * Test that when nodes are insterted into the head of the list
  * that they remain in order of insert head.
  */
-//void unitTest_dlistInsertHead(void)
-TEST(dlist, insertHead)
+TEST(DList, insertHead)
 {
    int index;
    struct dlist head;
@@ -137,8 +135,7 @@ TEST(dlist, insertHead)
 /**
  * Test insertion to the end of the list
  */
-//void unitTest_dlistInsertTail(void)
-TEST(dlist, insertTail)
+TEST(DList, insertTail)
 {
    int index;
    struct dlist head;
@@ -170,8 +167,7 @@ TEST(dlist, insertTail)
 /**
  * Test that the get head function returns the correct head link
  */
-//void unitTest_dlistGetHead(void)
-TEST(dlist, getHead)
+TEST(DList, getHead)
 {
    int errors = 0;
    int index;
@@ -198,8 +194,7 @@ TEST(dlist, getHead)
 /**
  * Test that the get head function returns the correct tail link
  */
-//void unitTest_dlistGetTail(void)
-TEST(dlist, getTail)
+TEST(DList, getTail)
 {
    int errors = 0;
    int index;
@@ -225,8 +220,7 @@ TEST(dlist, getTail)
 /**
  * Test the get next operation of dlist
  */
-//void unitTest_dlistGetNext(void)
-TEST(dlist, getNext)
+TEST(DList, getNext)
 {
    int index;
 
@@ -262,8 +256,7 @@ TEST(dlist, getNext)
 /**
  * Test the get prev operation of dlist
  */
-//void unitTest_dlistGetPrev(void)
-TEST(dlist, getPrev)
+TEST(DList, getPrev)
 {
    int index;
 
@@ -299,8 +292,7 @@ TEST(dlist, getPrev)
 /**
  * Test the remove function
  */
-//void unitTest_dlistRemove(void)
-TEST(dlist, remove)
+TEST(DList, remove)
 {
    int errors = 0;
    int index;
@@ -366,7 +358,7 @@ TEST(dlist, remove)
 }
 
 //void unitTest_dlistReinsert(void)
-TEST(dlist, reInsert)
+TEST(DList, reInsert)
 {
    int index;
    int odd_count;
