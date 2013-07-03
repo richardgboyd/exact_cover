@@ -1,6 +1,7 @@
-#include "stdio.h"
-#include "unitTest.h"
+#include "gtest/gtest.h"
+extern "C" {
 #include "exact_cover.h"
+}
 
 #define MAX_COLUMNS  (7)
 #define MAX_ROWS     (6)
@@ -26,6 +27,65 @@ int example_state_space[] = { 0, 0, 1, 0, 1, 1, 0,
                               0, 1, 0, 0, 0, 0, 1,
                               0, 0, 0, 1, 1, 0, 1  };
 
+TEST(ExactCoverInitializers, ListLinksInitialize)
+{
+   list_links_initialize(&test_data.head);
+
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.row));
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.column));
+}
+
+TEST(ExactCoverInitializers, ColumnInitializeSingleEntry)
+{
+   column_object_initialize(&test_data.columns[0], (char *)names[0]);
+   ASSERT_TRUE(dlist_is_empty(&test_data.columns[0].link.row));
+   ASSERT_TRUE(dlist_is_empty(&test_data.columns[0].link.column));
+   ASSERT_EQ(0, test_data.columns[0].count);
+   ASSERT_STREQ("A", test_data.columns[0].name);
+}
+
+TEST(ExactCoverInitializers, ColumnInitializeMultipleEntries)
+{
+   int index;
+
+   for (index = 0; index < MAX_COLUMNS; index++)
+      column_object_initialize(&test_data.columns[index], (char *)names[index]);
+
+   for (index = 0; index < MAX_COLUMNS; index++)
+   {
+      ASSERT_TRUE(dlist_is_empty(&test_data.columns[index].link.row));
+      ASSERT_TRUE(dlist_is_empty(&test_data.columns[index].link.column));
+      ASSERT_EQ(0, test_data.columns[index].count);
+      ASSERT_STREQ(names[index], test_data.columns[index].name);
+   }
+}
+
+TEST(ExactCoverInitializers, RowInitializeOneEntry)
+{
+   data_object_initialize(&test_data.datum[0]);
+
+   ASSERT_TRUE(dlist_is_empty(&test_data.datum[0].link.row));
+   ASSERT_TRUE(dlist_is_empty(&test_data.datum[0].link.column));
+   ASSERT_EQ(NULL, test_data.datum[0].column_handle);
+   ASSERT_EQ(0, test_data.datum[0].id);
+}
+
+TEST(ExactCoverInitializers, RowInitializeMultipleEntries)
+{
+   int index;
+
+   for (index = 0; index < MAX_DATA; index++)
+      data_object_initialize(&test_data.datum[index]);
+
+   for (index = 0; index < MAX_DATA; index++)
+   {
+      ASSERT_TRUE(dlist_is_empty(&test_data.datum[index].link.row));
+      ASSERT_TRUE(dlist_is_empty(&test_data.datum[index].link.column));
+      ASSERT_EQ(NULL, test_data.datum[index].column_handle);
+      ASSERT_EQ(0, test_data.datum[index].id);
+   }
+}
+
 /**
  * Take the simple route and initialize the entire state space object
  *
@@ -45,6 +105,93 @@ void unitTest_initializeStateSpace(
 
    for (index = 0; index < MAX_DATA; index++)
       data_object_initialize(&test_data->datum[index]);
+}
+
+/**
+ * We have tested the basic initialization we can now move on to the more
+ * complex initializers or building an actual state space.
+ */
+TEST(ExactCoverInitializers, StateSpaceAddSingleColumn)
+{
+   unitTest_initializeStateSpace(&test_data);
+
+   state_space_add_column(&test_data.head, &test_data.columns[0]);
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.row));
+   ASSERT_FALSE(dlist_is_empty(&test_data.head.column));
+   ASSERT_EQ(&test_data.columns[0], 
+             dlist_get_object(dlist_get_next(&test_data.head.column), struct column_object, link.column));
+   ASSERT_EQ(&test_data.columns[0], COLUMN_OBJECT_DOWN(&test_data.columns[0]));
+}
+
+TEST(ExactCoverInitializers, StateSpaceAddMultipleColumns)
+{
+   int index;
+   struct column_object * column;
+   struct dlist         * element;
+
+   unitTest_initializeStateSpace(&test_data);
+
+   for (index = 0; index < MAX_COLUMNS; index++)
+      state_space_add_column(&test_data.head, &test_data.columns[index]);
+
+   index = 0;
+   element = dlist_get_next(&test_data.head.column);
+   while (element != &test_data.head.column)
+   {
+      column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+      element = dlist_get_next(element);
+
+      ASSERT_EQ(&test_data.columns[index++], column);
+   }
+}
+
+TEST(ExactCoverInitializers, StateSpaceAddSingleRow)
+{
+   unitTest_initializeStateSpace(&test_data);
+
+   state_space_add_column(&test_data.head, &test_data.columns[0]);
+   column_object_add_data(&test_data.columns[0], &test_data.datum[0], 1);
+   // Check that the column object was updated as we expected
+   ASSERT_EQ(1, COLUMN_OBJECT_COUNT(&test_data.columns[0]));
+   ASSERT_EQ(OBJECT_DOWN(&test_data.columns[0]), OBJECT_ROW(&test_data.datum[0]));
+   // Check that the data object is now a member of the column
+   ASSERT_TRUE(dlist_is_empty(DATA_OBJECT_COLUMN(&test_data.datum[0])));
+   ASSERT_FALSE(dlist_is_empty(DATA_OBJECT_ROW(&test_data.datum[0])));
+   ASSERT_EQ(&test_data.columns[0], DATA_OBJECT_COLUMN_HANDLE(&test_data.datum[0]));
+   ASSERT_EQ(1, test_data.datum[0].id);
+}
+
+TEST(ExactCoverInitializers, StateSpaceAddMultipleRows)
+{
+   int index;
+   struct column_object * column;
+   struct data_object   * data;
+   struct dlist         * element;
+
+   unitTest_initializeStateSpace(&test_data);
+
+   state_space_add_column(&test_data.head, &test_data.columns[0]);
+   for (index = 0; index < MAX_COLUMNS; index++)
+      column_object_add_data(&test_data.columns[0], &test_data.datum[index], index + 1);
+   // Check that the column object was updated as we expected
+   ASSERT_EQ(index, COLUMN_OBJECT_COUNT(&test_data.columns[0]));
+   ASSERT_EQ(OBJECT_DOWN(&test_data.columns[0]), OBJECT_ROW(&test_data.datum[0]));
+
+   // Initialize the data to walk the list by all of its columns
+   index = 0;
+   element = dlist_get_next(&test_data.head.column);
+   column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+   element = OBJECT_DOWN(column);
+   while (element != COLUMN_OBJECT_ROW(column))
+   {
+      data = DATA_OBJECT_FROM_ROW_DLIST(element);
+      element = OBJECT_DOWN(data);
+
+      // Check that the data object is now a member of the column
+      ASSERT_EQ(&test_data.columns[0], DATA_OBJECT_COLUMN_HANDLE(&test_data.datum[index]));
+      ASSERT_EQ(index + 1, test_data.datum[index].id);
+      ASSERT_EQ(&test_data.datum[index++], data);
+   }
 }
 
 /**
@@ -124,18 +271,14 @@ void unitTest_constructSampleState(
  * active rows both are available for selection and the first encountered
  * is returned so we check to column 0 to be returned.
  */
-void unitTest_simpleColumnObjectSelection(void)
+TEST(ExactCoverSimple, ColumnObjectSelection)
 {
    struct column_object * column;
    
    unitTest_constructSimpleState(&test_data);
-
    column = column_object_selection(&test_data.head);
 
-   unitTest_Equal(
-      column, &test_data.columns[0],
-      ("unitTest_simpleColumnObjectSelection: expected columns[0] to be selected.\n")
-   );
+   ASSERT_EQ(column, &test_data.columns[0]);
 }
 
 /**
@@ -143,8 +286,10 @@ void unitTest_simpleColumnObjectSelection(void)
  * involves removing the covered column from the list and any matching rows
  * from the list.
  */
-void unitTest_simpleColumnObjectCovering(void)
+TEST(ExactCoverSimple, ColumnObjectCovering)
 {
+#if 0
+   int index;
    struct column_object * column;
    struct dlist         * element;
 
@@ -152,30 +297,21 @@ void unitTest_simpleColumnObjectCovering(void)
    unitTest_constructSimpleState(&test_data);
 
    column_object_covering(column);
-   unitTest_False(
-      dlist_is_empty(&test_data.head.column),
-      ("unitTest_simpleColumnObjectCovering: head list is empty after first cover operation.\n")
-   );
+   ASSERT_FALSE(dlist_is_empty(&test_data.head.column));
 
+   index = 0;
    element = dlist_get_next(&test_data.head.column);
    while (element != &test_data.head.column)
    {
       column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
       element = dlist_get_next(element);
 
-      unitTest_NotEqual(
-         column, &test_data.columns[0],
-         ("unitTest_simpleColumnObjectCovering: column[0] not removed from list.\n")
-      );
+      ASSERT_EQ(column, &test_data.columns[index++]);
    }
 
    column = &test_data.columns[1];
    column_object_covering(column);
-
-   unitTest_True(
-      dlist_is_empty(&test_data.head.column),
-      ("unitTest_simpleColumnObjectCovering: head list is not empty after second cover operation.\n")
-   );
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.column));
 
    element = dlist_get_next(&test_data.head.column);
    while (element != &test_data.head.column)
@@ -183,14 +319,12 @@ void unitTest_simpleColumnObjectCovering(void)
       column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
       element = dlist_get_next(element);
 
-      unitTest_NotEqual(
-         column, &test_data.columns[1],
-         ("unitTest_simpleColumnObjectCovering: column[1] not removed from list.\n")
-      );
+      ASSERT_NE(column, &test_data.columns[1]);
    }
+#endif
 }
 
-void unitTest_simpleColumnObjectUncovering(void)
+TEST(ExactCoverSimple, ColumnObjectUncovering)
 {
    struct column_object * column;
    struct dlist         * element;
@@ -201,16 +335,10 @@ void unitTest_simpleColumnObjectUncovering(void)
    memcpy(test_buffer, &test_data, sizeof(test_buffer));
 
    column_object_covering(column);
-   unitTest_True(
-      (memcmp(test_buffer, &test_data, sizeof(test_buffer)) != 0),
-      ("unitTest_simpleColumnObjectUncovering: expected covering operation to change test data.\n")
-   );
+   ASSERT_TRUE(memcmp(test_buffer, &test_data, sizeof(test_buffer)) != 0);
 
    column_object_uncover(column);
-   unitTest_True(
-      (memcmp(test_buffer, &test_data, sizeof(test_buffer)) == 0),
-      ("unitTest_simpleColumnObjectUncovering: expected uncovering operation to restore test data.\n")
-   );
+   ASSERT_TRUE(memcmp(test_buffer, &test_data, sizeof(test_buffer)) == 0);
 
    // Cover both columns
    column = &test_data.columns[0];
@@ -219,44 +347,29 @@ void unitTest_simpleColumnObjectUncovering(void)
 
    column = &test_data.columns[1];
    column_object_covering(column);
-   unitTest_True(
-      dlist_is_empty(&test_data.head.column),
-      ("unitTest_simpleColumnObjectUncovering: head list is not empty after second cover operation.\n")
-   );
-
-   unitTest_True(
-      (memcmp(test_buffer, &test_data, sizeof(test_buffer)) != 0),
-      ("unitTest_simpleColumnObjectUncovering: expected second covering operation to change test data.\n")
-   );
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.column));
+   ASSERT_TRUE(memcmp(test_buffer, &test_data, sizeof(test_buffer)) != 0);
 
    // Uncover the second column
    column_object_uncover(column);
-   unitTest_True(
-      (memcmp(test_buffer, &test_data, sizeof(test_buffer)) == 0),
-      ("unitTest_simpleColumnObjectUncovering: expected second covering operation to change test data.\n")
-   );
+   ASSERT_TRUE(memcmp(test_buffer, &test_data, sizeof(test_buffer)) == 0);
 
    // Uncover the first column
    column = &test_data.columns[0];
    column_object_uncover(column);
-   unitTest_True(
-      (memcmp(test_buffer, &test_data, sizeof(test_buffer)) != 0),
-      ("unitTest_simpleColumnObjectUncovering: expected second covering operation to change test data.\n")
-   );
+   ASSERT_TRUE(memcmp(test_buffer, &test_data, sizeof(test_buffer)) != 0);
 
    // Confirm we have restored the original buffer
    memcpy(test_buffer, &test_data, sizeof(test_buffer));
    unitTest_constructSimpleState(&test_data);
-   unitTest_True(
-      (memcmp(test_buffer, &test_data, sizeof(test_buffer)) == 0),
-      ("unitTest_simpleColumnObjectUncovering: expected second covering operation to change test data.\n")
-   );
+   ASSERT_TRUE(memcmp(test_buffer, &test_data, sizeof(test_buffer)) == 0);
 }
+
 
 /**
  * foo
  */
-void unitTest_simpleStateSpaceSearch(void)
+TEST(ExactCoverSimple, StateSpaceSearch)
 {
    struct data_object *output[3];
    unitTest_constructSimpleState(&test_data);
@@ -268,24 +381,20 @@ void unitTest_simpleStateSpaceSearch(void)
  * active rows both are available for selection and the first encountered
  * is returned so we check to column 0 to be returned.
  */
-void unitTest_sampleColumnObjectSelection(void)
+TEST(ExactCoverSample, ColumnObjectSelection)
 {
    struct column_object * column;
    
    unitTest_constructSampleState(&test_data);
-
    column = column_object_selection(&test_data.head);
 
-   unitTest_Equal(
-      column, &test_data.columns[0],
-      ("unitTest_sampleColumnObjectSelection: expected columns[0] to be selected.\n")
-   );
+   ASSERT_EQ(column, &test_data.columns[0]);
 }
 
 /**
  * Unimplemented
  */
-void unitTest_sampleColumnObjectCovering(void)
+TEST(ExactCoverSample, ColumnObjectCovering)
 {
 #if 0
    struct column_object * column;
@@ -337,28 +446,10 @@ void unitTest_sampleColumnObjectCovering(void)
 /**
  * Unimplemented
  */
-void unitTest_sampleColumnObjectUncovering(void)
+TEST(ExactCoverSample, ColumnObjectUnCovering)
 {
    struct data_object * output[6];
    unitTest_constructSampleState(&test_data);
    state_space_search(&test_data.head, output, 0);
 }
 
-int main(int argc, char **argv)
-{
-   // Simple setup
-   if (unitTest_GetErrorCount() == 0) unitTest_simpleColumnObjectSelection();
-   if (unitTest_GetErrorCount() == 0) unitTest_simpleColumnObjectCovering();
-   if (unitTest_GetErrorCount() == 0) unitTest_simpleColumnObjectUncovering();
-   if (unitTest_GetErrorCount() == 0) unitTest_simpleStateSpaceSearch();
-
-   // More complex setup
-   if (unitTest_GetErrorCount() == 0) unitTest_sampleColumnObjectSelection();
-   if (unitTest_GetErrorCount() == 0) unitTest_sampleColumnObjectCovering();
-   if (unitTest_GetErrorCount() == 0) unitTest_sampleColumnObjectUncovering();
-
-   if (unitTest_LoggingEnabled())
-      printf("%s completed with %d errors.\n", argv[0], unitTest_GetErrorCount());
-
-   return unitTest_GetErrorCount();
-}
