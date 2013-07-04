@@ -6,8 +6,8 @@
 /**
  * General object movement functions
  */
-#define OBJECT_ROW(o)    (&(o)->link.row)
-#define OBJECT_COLUMN(o) (&(o)->link.column)
+#define OBJECT_ROW(o)    (&(o)->link.row_traversal)
+#define OBJECT_COLUMN(o) (&(o)->link.column_traversal)
 
 #define OBJECT_RIGHT(o) dlist_get_next(OBJECT_COLUMN(o))
 #define OBJECT_LEFT(o)  dlist_get_prev(OBJECT_COLUMN(o))
@@ -19,33 +19,35 @@
 /**
  * Column object movement functions
  */
+#if 0
 #define COLUMN_OBJECT_RIGHT(c) \
    (struct column_object *)dlist_get_object( \
-      OBJECT_RIGHT(c), struct column_object, link.column)
+      OBJECT_RIGHT(c), struct column_object, link.column_traversal)
 
 #define COLUMN_OBJECT_LEFT(c) \
    (struct column_object *)dlist_get_object( \
-      OBJECT_LEFT(c), struct column_object, link.column)
+      OBJECT_LEFT(c), struct column_object, link.column_traversal)
 
 #define COLUMN_OBJECT_UP(c) \
    (struct column_object *)dlist_get_object( \
-      OBJECT_UP(c), struct column_object, link.row)
+      OBJECT_UP(c), struct column_object, link.row_traversal)
+#endif
 
 #define COLUMN_OBJECT_DOWN(c) \
    (struct column_object *)dlist_get_object( \
-      OBJECT_DOWN(c), struct column_object, link.row)
+      OBJECT_DOWN(c), struct column_object, link.row_traversal)
 
 #define COLUMN_OBJECT_FROM_ROW_DLIST(r) \
    (struct column_object *)dlist_get_object( \
-      (r), struct column_object, link.row)
+      (r), struct column_object, link.row_traversal)
 
 #define COLUMN_OBJECT_FROM_COLUMN_DLIST(c) \
    (struct column_object *)dlist_get_object( \
-      (c), struct column_object, link.column)
+      (c), struct column_object, link.column_traversal)
 
 
-#define COLUMN_OBJECT_ROW(c)    (&(c)->link.row)
-#define COLUMN_OBJECT_COLUMN(c) (&(c)->link.column)
+#define COLUMN_OBJECT_ROW(c)    (&(c)->link.row_traversal)
+#define COLUMN_OBJECT_COLUMN(c) (&(c)->link.column_traversal)
 #define COLUMN_OBJECT_COUNT(c)  ((c)->count)
 #define COLUMN_OBJECT_NAME(c)   ((c)->name)
 
@@ -54,30 +56,30 @@
  */
 #define DATA_OBJECT_RIGHT(d) \
    (struct data_object *)dlist_get_object( \
-      OBJECT_RIGHT(d), struct data_object, link.column)
+      OBJECT_RIGHT(d), struct data_object, link.column_traversal)
 
 #define DATA_OBJECT_LEFT(d) \
    (struct data_object *)dlist_get_object( \
-      OBJECT_LEFT(d), struct data_object, link.column)
+      OBJECT_LEFT(d), struct data_object, link.column_traversal)
 
 #define DATA_OBJECT_UP(d) \
    (struct data_object *)dlist_get_object( \
-      OBJECT_UP(d), struct data_object, link.row)
+      OBJECT_UP(d), struct data_object, link.row_traversal)
 
 #define DATA_OBJECT_DOWN(d) \
    (struct data_object *)dlist_get_object( \
-      OBJECT_DOWN(d), struct data_object, link.row)
+      OBJECT_DOWN(d), struct data_object, link.row_traversal)
 
 #define DATA_OBJECT_FROM_ROW_DLIST(r) \
    (struct data_object *)dlist_get_object( \
-      (r), struct data_object, link.row)
+      (r), struct data_object, link.row_traversal)
 
 #define DATA_OBJECT_FROM_COLUMN_DLIST(c) \
    (struct data_object *)dlist_get_object( \
-      (c), struct data_object, link.column)
+      (c), struct data_object, link.column_traversal)
 
-#define DATA_OBJECT_ROW(d)           (&(d)->link.row)
-#define DATA_OBJECT_COLUMN(d)        (&(d)->link.column)
+#define DATA_OBJECT_ROW(d)           (&(d)->link.row_traversal)
+#define DATA_OBJECT_COLUMN(d)        (&(d)->link.column_traversal)
 #define DATA_OBJECT_COLUMN_HANDLE(d) ((d)->column_handle)
 
 /**
@@ -86,8 +88,8 @@
  */
 struct list_links
 {
-   struct dlist row;
-   struct dlist column;
+   struct dlist row_traversal;
+   struct dlist column_traversal;
 };
 
 /**

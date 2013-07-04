@@ -31,15 +31,15 @@ TEST(ExactCoverInitializers, ListLinksInitialize)
 {
    list_links_initialize(&test_data.head);
 
-   ASSERT_TRUE(dlist_is_empty(&test_data.head.row));
-   ASSERT_TRUE(dlist_is_empty(&test_data.head.column));
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.row_traversal));
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.column_traversal));
 }
 
 TEST(ExactCoverInitializers, ColumnInitializeSingleEntry)
 {
    column_object_initialize(&test_data.columns[0], (char *)names[0]);
-   ASSERT_TRUE(dlist_is_empty(&test_data.columns[0].link.row));
-   ASSERT_TRUE(dlist_is_empty(&test_data.columns[0].link.column));
+   ASSERT_TRUE(dlist_is_empty(&test_data.columns[0].link.row_traversal));
+   ASSERT_TRUE(dlist_is_empty(&test_data.columns[0].link.column_traversal));
    ASSERT_EQ(0, test_data.columns[0].count);
    ASSERT_STREQ("A", test_data.columns[0].name);
 }
@@ -53,8 +53,8 @@ TEST(ExactCoverInitializers, ColumnInitializeMultipleEntries)
 
    for (index = 0; index < MAX_COLUMNS; index++)
    {
-      ASSERT_TRUE(dlist_is_empty(&test_data.columns[index].link.row));
-      ASSERT_TRUE(dlist_is_empty(&test_data.columns[index].link.column));
+      ASSERT_TRUE(dlist_is_empty(&test_data.columns[index].link.row_traversal));
+      ASSERT_TRUE(dlist_is_empty(&test_data.columns[index].link.column_traversal));
       ASSERT_EQ(0, test_data.columns[index].count);
       ASSERT_STREQ(names[index], test_data.columns[index].name);
    }
@@ -64,8 +64,8 @@ TEST(ExactCoverInitializers, RowInitializeOneEntry)
 {
    data_object_initialize(&test_data.datum[0]);
 
-   ASSERT_TRUE(dlist_is_empty(&test_data.datum[0].link.row));
-   ASSERT_TRUE(dlist_is_empty(&test_data.datum[0].link.column));
+   ASSERT_TRUE(dlist_is_empty(&test_data.datum[0].link.row_traversal));
+   ASSERT_TRUE(dlist_is_empty(&test_data.datum[0].link.column_traversal));
    ASSERT_EQ(NULL, test_data.datum[0].column_handle);
    ASSERT_EQ(0, test_data.datum[0].id);
 }
@@ -79,8 +79,8 @@ TEST(ExactCoverInitializers, RowInitializeMultipleEntries)
 
    for (index = 0; index < MAX_DATA; index++)
    {
-      ASSERT_TRUE(dlist_is_empty(&test_data.datum[index].link.row));
-      ASSERT_TRUE(dlist_is_empty(&test_data.datum[index].link.column));
+      ASSERT_TRUE(dlist_is_empty(&test_data.datum[index].link.row_traversal));
+      ASSERT_TRUE(dlist_is_empty(&test_data.datum[index].link.column_traversal));
       ASSERT_EQ(NULL, test_data.datum[index].column_handle);
       ASSERT_EQ(0, test_data.datum[index].id);
    }
@@ -116,10 +116,10 @@ TEST(ExactCoverInitializers, StateSpaceAddSingleColumn)
    unitTest_initializeStateSpace(&test_data);
 
    state_space_add_column(&test_data.head, &test_data.columns[0]);
-   ASSERT_TRUE(dlist_is_empty(&test_data.head.row));
-   ASSERT_FALSE(dlist_is_empty(&test_data.head.column));
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.row_traversal));
+   ASSERT_FALSE(dlist_is_empty(&test_data.head.column_traversal));
    ASSERT_EQ(&test_data.columns[0], 
-             dlist_get_object(dlist_get_next(&test_data.head.column), struct column_object, link.column));
+             dlist_get_object(dlist_get_next(&test_data.head.column_traversal), struct column_object, link.column_traversal));
    ASSERT_EQ(&test_data.columns[0], COLUMN_OBJECT_DOWN(&test_data.columns[0]));
 }
 
@@ -135,8 +135,8 @@ TEST(ExactCoverInitializers, StateSpaceAddMultipleColumns)
       state_space_add_column(&test_data.head, &test_data.columns[index]);
 
    index = 0;
-   element = dlist_get_next(&test_data.head.column);
-   while (element != &test_data.head.column)
+   element = dlist_get_next(&test_data.head.column_traversal);
+   while (element != &test_data.head.column_traversal)
    {
       column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
       element = dlist_get_next(element);
@@ -179,7 +179,7 @@ TEST(ExactCoverInitializers, StateSpaceAddMultipleRows)
 
    // Initialize the data to walk the list by all of its columns
    index = 0;
-   element = dlist_get_next(&test_data.head.column);
+   element = dlist_get_next(&test_data.head.column_traversal);
    column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
    element = OBJECT_DOWN(column);
    while (element != COLUMN_OBJECT_ROW(column))
@@ -210,7 +210,7 @@ void unitTest_constructStateSpace(
    int                  rows
 )
 {
-   int index, j;
+   int index; //, j;
    int column_index = 0;
    int data_index   = 0;
 
@@ -327,7 +327,6 @@ TEST(ExactCoverSimple, ColumnObjectCovering)
 TEST(ExactCoverSimple, ColumnObjectUncovering)
 {
    struct column_object * column;
-   struct dlist         * element;
    char   test_buffer[sizeof(test_data)];
 
    column = &test_data.columns[0];
@@ -347,7 +346,7 @@ TEST(ExactCoverSimple, ColumnObjectUncovering)
 
    column = &test_data.columns[1];
    column_object_covering(column);
-   ASSERT_TRUE(dlist_is_empty(&test_data.head.column));
+   ASSERT_TRUE(dlist_is_empty(&test_data.head.column_traversal));
    ASSERT_TRUE(memcmp(test_buffer, &test_data, sizeof(test_buffer)) != 0);
 
    // Uncover the second column
