@@ -6,14 +6,14 @@
 /**
  * General object movement functions
  */
-#define OBJECT_ROW(o)    (&(o)->link.row_traversal)
-#define OBJECT_COLUMN(o) (&(o)->link.column_traversal)
+#define OBJECT_ROW_TRAVERSAL(o)  (&(o)->link.row_traversal)
+#define OBJECT_COLUMN_TRAVERSAL(o) (&(o)->link.column_traversal)
 
-#define OBJECT_RIGHT(o) dlist_get_next(OBJECT_COLUMN(o))
-#define OBJECT_LEFT(o)  dlist_get_prev(OBJECT_COLUMN(o))
+#define OBJECT_RIGHT(o) dlist_get_next(OBJECT_COLUMN_TRAVERSAL(o))
+#define OBJECT_LEFT(o)  dlist_get_prev(OBJECT_COLUMN_TRAVERSAL(o))
 
-#define OBJECT_UP(o)   dlist_get_prev(OBJECT_ROW(o))
-#define OBJECT_DOWN(o) dlist_get_next(OBJECT_ROW(o))
+#define OBJECT_UP(o)   dlist_get_prev(OBJECT_ROW_TRAVERSAL(o))
+#define OBJECT_DOWN(o) dlist_get_next(OBJECT_ROW_TRAVERSAL(o))
 
 
 /**
