@@ -27,6 +27,88 @@ int example_state_space[] = { 0, 0, 1, 0, 1, 1, 0,
                               0, 1, 0, 0, 0, 0, 1,
                               0, 0, 0, 1, 1, 0, 1  };
 
+struct list_links_test_object
+{
+   struct list_links link;
+};
+
+#define MAX_TEST_OBJECTS_UNIDIRECTIONAL (3)
+#define MAX_TEST_OBJECTS_BIDIRECTIONAL (4)
+TEST(ExactCoverMacros, ColumnTraversal)
+{
+   int i;
+   list_links_test_object magic_rings[MAX_TEST_OBJECTS_UNIDIRECTIONAL];
+
+   for (i = 0; i < MAX_TEST_OBJECTS_UNIDIRECTIONAL; i++)
+      list_links_initialize(&magic_rings[i].link);
+
+   dlist_insert_tail(OBJECT_COLUMN_TRAVERSAL(&magic_rings[0]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[1]));
+   dlist_insert_tail(OBJECT_COLUMN_TRAVERSAL(&magic_rings[0]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[2]));
+   ASSERT_TRUE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[0])));
+   ASSERT_TRUE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[1])));
+   ASSERT_TRUE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[2])));
+
+   // Left/Right should do column traversal
+   ASSERT_EQ(OBJECT_RIGHT(&magic_rings[0]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[1]));
+   ASSERT_EQ(OBJECT_RIGHT(&magic_rings[1]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[2]));
+   ASSERT_EQ(OBJECT_RIGHT(&magic_rings[2]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[0]));
+
+   ASSERT_EQ(OBJECT_LEFT(&magic_rings[0]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[2]));
+   ASSERT_EQ(OBJECT_LEFT(&magic_rings[1]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[0]));
+   ASSERT_EQ(OBJECT_LEFT(&magic_rings[2]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[1]));
+}
+
+TEST(ExactCoverMacros, RowTraversal)
+{
+   int i;
+   list_links_test_object magic_rings[MAX_TEST_OBJECTS_UNIDIRECTIONAL];
+
+   for (i = 0; i < MAX_TEST_OBJECTS_UNIDIRECTIONAL; i++)
+      list_links_initialize(&magic_rings[i].link);
+
+   dlist_insert_tail(OBJECT_ROW_TRAVERSAL(&magic_rings[0]), OBJECT_ROW_TRAVERSAL(&magic_rings[1]));
+   dlist_insert_tail(OBJECT_ROW_TRAVERSAL(&magic_rings[0]), OBJECT_ROW_TRAVERSAL(&magic_rings[2]));
+
+   ASSERT_TRUE(dlist_is_empty(OBJECT_COLUMN_TRAVERSAL(&magic_rings[0])));
+   ASSERT_TRUE(dlist_is_empty(OBJECT_COLUMN_TRAVERSAL(&magic_rings[1])));
+   ASSERT_TRUE(dlist_is_empty(OBJECT_COLUMN_TRAVERSAL(&magic_rings[2])));
+
+   // Up/Down should do row traversal
+   ASSERT_EQ(OBJECT_DOWN(&magic_rings[0]), OBJECT_ROW_TRAVERSAL(&magic_rings[1]));
+   ASSERT_EQ(OBJECT_DOWN(&magic_rings[1]), OBJECT_ROW_TRAVERSAL(&magic_rings[2]));
+   ASSERT_EQ(OBJECT_DOWN(&magic_rings[2]), OBJECT_ROW_TRAVERSAL(&magic_rings[0]));
+
+   ASSERT_EQ(OBJECT_UP(&magic_rings[0]), OBJECT_ROW_TRAVERSAL(&magic_rings[2]));
+   ASSERT_EQ(OBJECT_UP(&magic_rings[1]), OBJECT_ROW_TRAVERSAL(&magic_rings[0]));
+   ASSERT_EQ(OBJECT_UP(&magic_rings[2]), OBJECT_ROW_TRAVERSAL(&magic_rings[1]));
+}
+
+TEST(ExactCoverMacros, ColumnRowTraversal)
+{
+   int i;
+   list_links_test_object magic_rings[MAX_TEST_OBJECTS_BIDIRECTIONAL];
+
+   for (i = 0; i < MAX_TEST_OBJECTS_BIDIRECTIONAL; i++)
+      list_links_initialize(&magic_rings[i].link);
+
+   dlist_insert_tail(OBJECT_COLUMN_TRAVERSAL(&magic_rings[0]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[1]));
+   dlist_insert_tail(OBJECT_COLUMN_TRAVERSAL(&magic_rings[2]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[3]));
+   dlist_insert_tail(OBJECT_ROW_TRAVERSAL(&magic_rings[0]), OBJECT_ROW_TRAVERSAL(&magic_rings[2]));
+   dlist_insert_tail(OBJECT_ROW_TRAVERSAL(&magic_rings[1]), OBJECT_ROW_TRAVERSAL(&magic_rings[3]));
+
+   ASSERT_FALSE(dlist_is_empty(OBJECT_COLUMN_TRAVERSAL(&magic_rings[0])));
+   ASSERT_FALSE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[0])));
+   ASSERT_FALSE(dlist_is_empty(OBJECT_COLUMN_TRAVERSAL(&magic_rings[1])));
+   ASSERT_FALSE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[1])));
+   ASSERT_FALSE(dlist_is_empty(OBJECT_COLUMN_TRAVERSAL(&magic_rings[2])));
+   ASSERT_FALSE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[2])));
+
+   // We should now have O0 -- O1
+   //                     |    |
+   //                    O2 -- O3
+}
+
+
 TEST(ExactCoverInitializers, ListLinksInitialize)
 {
    list_links_initialize(&test_data.head);
@@ -153,7 +235,7 @@ TEST(ExactCoverInitializers, StateSpaceAddSingleRow)
    column_object_add_data(&test_data.columns[0], &test_data.datum[0], 1);
    // Check that the column object was updated as we expected
    ASSERT_EQ(1, COLUMN_OBJECT_COUNT(&test_data.columns[0]));
-   ASSERT_EQ(OBJECT_DOWN(&test_data.columns[0]), OBJECT_ROW(&test_data.datum[0]));
+   ASSERT_EQ(OBJECT_DOWN(&test_data.columns[0]), OBJECT_ROW_TRAVERSAL(&test_data.datum[0]));
    // Check that the data object is now a member of the column
    ASSERT_TRUE(dlist_is_empty(DATA_OBJECT_COLUMN(&test_data.datum[0])));
    ASSERT_FALSE(dlist_is_empty(DATA_OBJECT_ROW(&test_data.datum[0])));
@@ -175,7 +257,7 @@ TEST(ExactCoverInitializers, StateSpaceAddMultipleRows)
       column_object_add_data(&test_data.columns[0], &test_data.datum[index], index + 1);
    // Check that the column object was updated as we expected
    ASSERT_EQ(index, COLUMN_OBJECT_COUNT(&test_data.columns[0]));
-   ASSERT_EQ(OBJECT_DOWN(&test_data.columns[0]), OBJECT_ROW(&test_data.datum[0]));
+   ASSERT_EQ(OBJECT_DOWN(&test_data.columns[0]), OBJECT_ROW_TRAVERSAL(&test_data.datum[0]));
 
    // Initialize the data to walk the list by all of its columns
    index = 0;
