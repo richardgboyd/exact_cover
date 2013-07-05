@@ -37,11 +37,11 @@
    (struct column_object *)dlist_get_object( \
       OBJECT_DOWN(c), struct column_object, link.row_traversal)
 
-#define COLUMN_OBJECT_FROM_ROW_DLIST(r) \
+#define COLUMN_OBJECT_FROM_ROW_TRAVERSAL(r) \
    (struct column_object *)dlist_get_object( \
       (r), struct column_object, link.row_traversal)
 
-#define COLUMN_OBJECT_FROM_COLUMN_DLIST(c) \
+#define COLUMN_OBJECT_FROM_COLUMN_TRAVERSAL(c) \
    (struct column_object *)dlist_get_object( \
       (c), struct column_object, link.column_traversal)
 
@@ -70,11 +70,11 @@
    (struct data_object *)dlist_get_object( \
       OBJECT_DOWN(d), struct data_object, link.row_traversal)
 
-#define DATA_OBJECT_FROM_ROW_DLIST(r) \
+#define DATA_OBJECT_FROM_ROW_TRAVERSAL(r) \
    (struct data_object *)dlist_get_object( \
       (r), struct data_object, link.row_traversal)
 
-#define DATA_OBJECT_FROM_COLUMN_DLIST(c) \
+#define DATA_OBJECT_FROM_COLUMN_TRAVERSAL(c) \
    (struct data_object *)dlist_get_object( \
       (c), struct data_object, link.column_traversal)
 

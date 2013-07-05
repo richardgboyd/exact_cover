@@ -15,8 +15,8 @@ extern "C" {
  */
 void list_links_initialize(struct list_links * object)
 {
-   dlist_init(&object->row);
-   dlist_init(&object->column);
+   dlist_init(&object->row_traversal);
+   dlist_init(&object->column_traversal);
 }
 
 void data_object_initialize(struct data_object * object)
@@ -40,7 +40,7 @@ void state_space_add_column(
    struct column_object * object
 )
 {
-   dlist_insert_tail(&head->column, COLUMN_OBJECT_COLUMN(object));
+   dlist_insert_tail(&head->column_traversal, COLUMN_OBJECT_COLUMN(object));
 }
 
 void column_object_add_data(
@@ -61,7 +61,7 @@ void data_object_add_neighbor(
 )
 {
    //dlist_insert_tail(DATA_OBJECT_COLUMN(object), DATA_OBJECT_COLUMN(neighbor));
-   dlist_insert_tail(&object->link.column, &neighbor->link.column);
+   dlist_insert_tail(&object->link.column_traversal, &neighbor->link.column_traversal);
 }
 
 /**
@@ -79,10 +79,10 @@ column_object_selection(struct list_links * head)
    struct column_object * object;
    struct dlist         * element;
 
-   element = dlist_get_next(&head->column);
-   while (element != &head->column)
+   element = dlist_get_next(&head->column_traversal);
+   while (element != &head->column_traversal)
    {
-      object = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+      object = COLUMN_OBJECT_FROM_COLUMN_TRAVERSAL(element);
 
       if (object->count < count)
       {
@@ -116,18 +116,18 @@ column_object_covering(struct column_object * c)
    struct data_object * object2;
 
    // Unlink the column object from the list
-   dlist_remove(&c->link.column);
+   dlist_remove(&c->link.column_traversal);
    row = OBJECT_DOWN(c);
 
-   while (row != &c->link.row)
+   while (row != &c->link.row_traversal)
    {
-      object1 = DATA_OBJECT_FROM_ROW_DLIST(row);
+      object1 = DATA_OBJECT_FROM_ROW_TRAVERSAL(row);
       row = dlist_get_next(row);
       column = OBJECT_RIGHT(object1);
 
       while (column != DATA_OBJECT_COLUMN(object1))
       {
-         object2 = DATA_OBJECT_FROM_COLUMN_DLIST(column);
+         object2 = DATA_OBJECT_FROM_COLUMN_TRAVERSAL(column);
          column = dlist_get_next(column);
          dlist_remove(DATA_OBJECT_ROW(object2));
          object2->column_handle->count--;
@@ -158,20 +158,20 @@ column_object_uncover(struct column_object * c)
 
    while (row != COLUMN_OBJECT_ROW(c))
    {
-      object1 = DATA_OBJECT_FROM_ROW_DLIST(row);
+      object1 = DATA_OBJECT_FROM_ROW_TRAVERSAL(row);
       row = dlist_get_prev(row);
       column = OBJECT_LEFT(object1);
 
       while (column != DATA_OBJECT_COLUMN(object1))
       {
-         object2 = DATA_OBJECT_FROM_COLUMN_DLIST(column);
+         object2 = DATA_OBJECT_FROM_COLUMN_TRAVERSAL(column);
          column = dlist_get_prev(column);
          object2->column_handle->count++;
          dlist_reinsert(DATA_OBJECT_ROW(object2));
       }
    }
 
-   dlist_reinsert(&c->link.column);
+   dlist_reinsert(&c->link.column_traversal);
 }
 
 
@@ -206,9 +206,9 @@ state_space_search(
    struct data_object   * object1;
    struct data_object   * object2;
 
-   x = dlist_get_next(&head->column);
+   x = dlist_get_next(&head->column_traversal);
 
-   if (x == &head->column)
+   if (x == &head->column_traversal)
    {
       int index;
 
@@ -227,12 +227,12 @@ state_space_search(
    r = OBJECT_DOWN(c);
    while (r != COLUMN_OBJECT_ROW(c))
    {
-      O[k] = DATA_OBJECT_FROM_ROW_DLIST(r);
+      O[k] = DATA_OBJECT_FROM_ROW_TRAVERSAL(r);
 
       j = OBJECT_RIGHT(O[k]);
       while (j != COLUMN_OBJECT_COLUMN(O[k]))
       {
-         object2 = DATA_OBJECT_FROM_COLUMN_DLIST(j);
+         object2 = DATA_OBJECT_FROM_COLUMN_TRAVERSAL(j);
          j = dlist_get_next(j);
          column_object_covering(object2->column_handle);
       }
@@ -245,7 +245,7 @@ state_space_search(
       j = OBJECT_LEFT(object1);
       while (j != DATA_OBJECT_COLUMN(object1))
       {
-         object2 = DATA_OBJECT_FROM_COLUMN_DLIST(j);
+         object2 = DATA_OBJECT_FROM_COLUMN_TRAVERSAL(j);
          j = dlist_get_prev(j);
          column_object_uncover(object2->column_handle);
       }

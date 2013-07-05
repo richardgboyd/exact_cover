@@ -102,10 +102,21 @@ TEST(ExactCoverMacros, ColumnRowTraversal)
    ASSERT_FALSE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[1])));
    ASSERT_FALSE(dlist_is_empty(OBJECT_COLUMN_TRAVERSAL(&magic_rings[2])));
    ASSERT_FALSE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[2])));
+   ASSERT_FALSE(dlist_is_empty(OBJECT_COLUMN_TRAVERSAL(&magic_rings[3])));
+   ASSERT_FALSE(dlist_is_empty(OBJECT_ROW_TRAVERSAL(&magic_rings[3])));
 
    // We should now have O0 -- O1
    //                     |    |
    //                    O2 -- O3
+   ASSERT_EQ(OBJECT_RIGHT(&magic_rings[0]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[1]));
+   ASSERT_EQ(OBJECT_RIGHT(&magic_rings[1]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[0]));
+   ASSERT_EQ(OBJECT_RIGHT(&magic_rings[2]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[3]));
+   ASSERT_EQ(OBJECT_RIGHT(&magic_rings[3]), OBJECT_COLUMN_TRAVERSAL(&magic_rings[2]));
+
+   ASSERT_EQ(OBJECT_DOWN(&magic_rings[0]), OBJECT_ROW_TRAVERSAL(&magic_rings[2]));
+   ASSERT_EQ(OBJECT_DOWN(&magic_rings[1]), OBJECT_ROW_TRAVERSAL(&magic_rings[3]));
+   ASSERT_EQ(OBJECT_DOWN(&magic_rings[2]), OBJECT_ROW_TRAVERSAL(&magic_rings[0]));
+   ASSERT_EQ(OBJECT_DOWN(&magic_rings[3]), OBJECT_ROW_TRAVERSAL(&magic_rings[1]));
 }
 
 
@@ -220,7 +231,7 @@ TEST(ExactCoverInitializers, StateSpaceAddMultipleColumns)
    element = dlist_get_next(&test_data.head.column_traversal);
    while (element != &test_data.head.column_traversal)
    {
-      column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+      column = COLUMN_OBJECT_FROM_COLUMN_TRAVERSAL(element);
       element = dlist_get_next(element);
 
       ASSERT_EQ(&test_data.columns[index++], column);
@@ -262,11 +273,11 @@ TEST(ExactCoverInitializers, StateSpaceAddMultipleRows)
    // Initialize the data to walk the list by all of its columns
    index = 0;
    element = dlist_get_next(&test_data.head.column_traversal);
-   column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+   column = COLUMN_OBJECT_FROM_COLUMN_TRAVERSAL(element);
    element = OBJECT_DOWN(column);
    while (element != COLUMN_OBJECT_ROW(column))
    {
-      data = DATA_OBJECT_FROM_ROW_DLIST(element);
+      data = DATA_OBJECT_FROM_ROW_TRAVERSAL(element);
       element = OBJECT_DOWN(data);
 
       // Check that the data object is now a member of the column
@@ -385,7 +396,7 @@ TEST(ExactCoverSimple, ColumnObjectCovering)
    element = dlist_get_next(&test_data.head.column);
    while (element != &test_data.head.column)
    {
-      column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+      column = COLUMN_OBJECT_FROM_COLUMN_TRAVERSAL(element);
       element = dlist_get_next(element);
 
       ASSERT_EQ(column, &test_data.columns[index++]);
@@ -398,7 +409,7 @@ TEST(ExactCoverSimple, ColumnObjectCovering)
    element = dlist_get_next(&test_data.head.column);
    while (element != &test_data.head.column)
    {
-      column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+      column = COLUMN_OBJECT_FROM_COLUMN_TRAVERSAL(element);
       element = dlist_get_next(element);
 
       ASSERT_NE(column, &test_data.columns[1]);
@@ -493,7 +504,7 @@ TEST(ExactCoverSample, ColumnObjectCovering)
    element = dlist_get_next(&test_data.head.column);
    while (element != &test_data.head.column)
    {
-      column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+      column = COLUMN_OBJECT_FROM_COLUMN_TRAVERSAL(element);
       element = dlist_get_next(element);
 
       unitTest_NotEqual(
@@ -513,7 +524,7 @@ TEST(ExactCoverSample, ColumnObjectCovering)
    element = dlist_get_next(&test_data.head.column);
    while (element != &test_data.head.column)
    {
-      column = COLUMN_OBJECT_FROM_COLUMN_DLIST(element);
+      column = COLUMN_OBJECT_FROM_COLUMN_TRAVERSAL(element);
       element = dlist_get_next(element);
 
       unitTest_NotEqual(
