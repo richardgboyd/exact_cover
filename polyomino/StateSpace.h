@@ -1,3 +1,15 @@
+/*******************************************************************************
+
+   State space constructor for building state for exact cover problem
+
+   Author:  Richard Boyd
+   email:   richardgboyd@gmail.com
+   Date:    2013.07.15
+
+*******************************************************************************/
+#ifndef STATE_SPACE_HEADER
+#define STATE_SPACE_HEADER
+
 #include <vector>
 #include "Shapes.h"
 #include "Board.h"
@@ -36,3 +48,5 @@ private:
 	std::vector<Shape *> shapes;
 	Board  board;
 };
+
+#endif 

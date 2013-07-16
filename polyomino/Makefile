@@ -60,3 +60,5 @@ testBoard.exe : testBoard.o Board.o Shapes.o gtest.a gtest_main.a
 testStateSpace.exe : testStateSpace.o StateSpace.o Board.o Shapes.o gtest.a gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
 
+Triomino.exe : Triomino.o StateSpace.o Board.o Shapes.o
+	$(CXX) $(CXXFLAGS) $^ -o $@

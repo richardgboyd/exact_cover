@@ -1,3 +1,16 @@
+/*******************************************************************************
+
+   Board creation and manipulation for the state space to build state for the
+   exact cover problem.
+
+   Author:  Richard Boyd
+   email:   richardgboyd@gmail.com
+   Date:    2013.07.15
+
+*******************************************************************************/
+#ifndef BOARD_HEADER
+#define BOARD_HEADER
+
 #include "Shapes.h"
 
 class Board
@@ -31,3 +44,5 @@ private:
    int *boardMap;
    int *boardIndex;
 };
+
+#endif

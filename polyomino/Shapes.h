@@ -1,3 +1,13 @@
+/*******************************************************************************
+
+   Shapes file that provides a way to define and manipulate shapes used in
+   building state space for exact cover problem
+
+   Author:  Richard Boyd
+   email:   richardgboyd@gmail.com
+   Date:    2013.07.15
+
+*******************************************************************************/
 #ifndef SHAPES_HEADER
 #define SHAPES_HEADER
 
