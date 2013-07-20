@@ -17,7 +17,7 @@
 class StateSpace
 {
 public:
-	StateSpace() { };
+	StateSpace() { maxShapeIndex = -1; }
 	~StateSpace();
 
 	void setBoard(Board const &_board);
@@ -25,7 +25,6 @@ public:
 
 	Board &getBoard(void) { return board; }
 
-	int getShapeCount() { return shapes.size(); }
 	Shape *getShapeAt(int index);
 
    void mapAllShapes(void);
@@ -36,9 +35,10 @@ public:
 #if !defined(UNIT_TEST)
 protected:
 #endif
-   int mapShape(int index);
-   int *getNewRow(int index);
+   int mapShape(Shape *shape);
+   int *getNewRow(Shape *shape);
 #if defined(UNIT_TEST)
+	int getShapeCount() { return shapes.size(); }
    int *getStateRow(int index) { return stateRows[index]; }
    int getStateRowCount(void) { return stateRows.size(); }
 #endif
@@ -47,6 +47,7 @@ private:
 	std::vector<int *> stateRows;
 	std::vector<Shape *> shapes;
 	Board  board;
+   int maxShapeIndex;
 };
 
 #endif 

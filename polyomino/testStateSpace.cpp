@@ -1,12 +1,19 @@
 #include "gtest/gtest.h"
 #include "StateSpace.h"
 
-TEST(StateSpace, defaultConstructor)
+class StateSpaceTest : public ::testing::Test
+{
+   virtual void SetUp() {
+      Shape::resetMasterIndex();
+   }
+};
+
+TEST_F(StateSpaceTest, defaultConstructor)
 {
 	StateSpace stateSpace;
 }
 
-TEST(StateSpace, setEmptyBoard)
+TEST_F(StateSpaceTest, setEmptyBoard)
 {
 	StateSpace stateSpace;
 	Board board;
@@ -17,7 +24,7 @@ TEST(StateSpace, setEmptyBoard)
    ASSERT_EQ(stateSpace.getBoard().getIndex(0), -1);
 }
 
-TEST(StateSpace, setSimpleBoard)
+TEST_F(StateSpaceTest, setSimpleBoard)
 {
    int testSpace[] = { 1, 1, 1, 1 };
    Board board(2, 2, testSpace);
@@ -29,7 +36,7 @@ TEST(StateSpace, setSimpleBoard)
    ASSERT_EQ(stateSpace.getBoard().getIndex(0),  0);
 }
 
-TEST(StateSpace, addShapeOnce)
+TEST_F(StateSpaceTest, addShapeOnce)
 {
    StateSpace stateSpace;
    Biomino * biomino = new Biomino(Cell(0,0), Cell(1,0));
@@ -40,7 +47,7 @@ TEST(StateSpace, addShapeOnce)
    ASSERT_TRUE(stateSpace.getShapeAt(1) == NULL);
 }
 
-TEST(StateSpace, addShapeTwice)
+TEST_F(StateSpaceTest, addShapeTwice)
 {
    StateSpace stateSpace;
    Biomino *biominoOne = new Biomino(Cell(0,0), Cell(1,0));
@@ -53,7 +60,7 @@ TEST(StateSpace, addShapeTwice)
    ASSERT_EQ(stateSpace.getShapeAt(1), biominoTwo);
 }
 
-TEST(StateSpace, getNewRow)
+TEST_F(StateSpaceTest, getNewRow)
 {
    int *stateSpaceRow;
    int boardState[] = { 1, 1, 1, 1 };
@@ -66,13 +73,13 @@ TEST(StateSpace, getNewRow)
    stateSpace.addShape(biominoOne);
    stateSpace.addShape(biominoTwo);
 
-   stateSpaceRow = stateSpace.getNewRow(0);
+   stateSpaceRow = stateSpace.getNewRow(biominoOne);
    ASSERT_TRUE(stateSpaceRow != NULL);
    ASSERT_EQ(stateSpaceRow[0], 1);
    ASSERT_EQ(stateSpaceRow[1], 0);
    delete stateSpaceRow;
 
-   stateSpaceRow = stateSpace.getNewRow(1);
+   stateSpaceRow = stateSpace.getNewRow(biominoTwo);
    ASSERT_TRUE(stateSpaceRow != NULL);
    ASSERT_EQ(stateSpaceRow[0], 0);
    ASSERT_EQ(stateSpaceRow[1], 1);
@@ -105,7 +112,7 @@ void testStateSpaceRowDisplay(int index, int *stateRow, int *testRow, int size)
    testStateSpaceRowPrint(testRow, size);
 }
 
-TEST(StateSpace, mapBiomino)
+TEST_F(StateSpaceTest, mapBiomino)
 {
    int createdRows, currentRow, i;
    int boardState[] = { 1, 1, 1, 1 };
@@ -113,7 +120,8 @@ TEST(StateSpace, mapBiomino)
          { 1, 0, 1, 1, 0, 0 },
          { 1, 0, 0, 0, 1, 1 },
          { 0, 1, 1, 0, 1, 0 },
-         { 0, 1, 0, 1, 0, 1 } };
+         { 0, 1, 0, 1, 0, 1 } 
+   };
 
    Board    board(2, 2, boardState);
    Biomino *biominoOne = new Biomino(Cell(0,0), Cell(1,0));
@@ -125,7 +133,8 @@ TEST(StateSpace, mapBiomino)
    stateSpace.addShape(biominoOne);
    stateSpace.addShape(biominoTwo);
 
-   createdRows = stateSpace.mapShape(0);
+   createdRows = stateSpace.mapShape(biominoOne);
+   //stateSpace.displayState();
    for (i = 0; i < createdRows; i++)
    {
       /*
@@ -142,7 +151,8 @@ TEST(StateSpace, mapBiomino)
    }
    currentRow += createdRows;
 
-   createdRows = stateSpace.mapShape(1);
+   createdRows = stateSpace.mapShape(biominoTwo);
+   //stateSpace.displayState();
    for (i = 0; i < createdRows; i++)
    {
       /*
@@ -159,16 +169,21 @@ TEST(StateSpace, mapBiomino)
    }
 }
 
-TEST(StateSpace, mapBiominos)
+TEST_F(StateSpaceTest, mapBiominos)
 {
    int i;
    int boardState[] = { 1, 1, 1, 1 };
-   int stateSpaceRows[4][6] = { 
+   int stateSpaceRows[8][6] = { 
    //      I1 I2  00 10 01 11
-         { 1, 0,  1, 1, 0, 0 },
-         { 1, 0,  0, 0, 1, 1 },
-         { 0, 1,  1, 0, 1, 0 },
-         { 0, 1,  0, 1, 0, 1 } };
+         { 1, 0, 1, 1, 0, 0 },
+         { 1, 0, 0, 0, 1, 1 },
+         { 1, 0, 1, 0, 1, 0 },
+         { 1, 0, 0, 1, 0, 1 },
+         { 0, 1, 1, 0, 1, 0 },
+         { 0, 1, 0, 1, 0, 1 },
+         { 0, 1, 1, 1, 0, 0 },
+         { 0, 1, 0, 0, 1, 1 }
+   };
 
    Board    board(2, 2, boardState);
    Biomino *biominoOne = new Biomino(Cell(0,0), Cell(1,0));
@@ -177,7 +192,9 @@ TEST(StateSpace, mapBiominos)
 
    stateSpace.setBoard(board);
    stateSpace.addShape(biominoOne);
+   stateSpace.addShape(biominoOne->rotate());
    stateSpace.addShape(biominoTwo);
+   stateSpace.addShape(biominoTwo->rotate());
 
    stateSpace.mapAllShapes();
    //stateSpace.displayState();
@@ -191,39 +208,39 @@ TEST(StateSpace, mapBiominos)
    }
 }
 
-TEST(StateSpace, mapTriominos)
+TEST_F(StateSpaceTest, mapTriominos)
 {
    int i;
    int boardState[] = { 1, 1, 1,  1, 1, 1,  1, 1, 1 };
-   int stateSpaceRows[22][15] = {
-   //   I1 I2 V1 V2 V3 V4  00 10 20  01 11 12  20 21 22
-      { 1, 0, 0, 0, 0, 0,  1, 1, 1,  0, 0, 0,  0, 0, 0 },
-      { 1, 0, 0, 0, 0, 0,  0, 0, 0,  1, 1, 1,  0, 0, 0 },
-      { 1, 0, 0, 0, 0, 0,  0, 0, 0,  0, 0, 0,  1, 1, 1 },
+   int stateSpaceRows[22][11] = {
+   //   I1 V1  00 10 20  01 11 12  20 21 22
+      { 1, 0,  1, 1, 1,  0, 0, 0,  0, 0, 0 },
+      { 1, 0,  0, 0, 0,  1, 1, 1,  0, 0, 0 },
+      { 1, 0,  0, 0, 0,  0, 0, 0,  1, 1, 1 },
 
-      { 0, 1, 0, 0, 0, 0,  1, 0, 0,  1, 0, 0,  1, 0, 0 },
-      { 0, 1, 0, 0, 0, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0 },
-      { 0, 1, 0, 0, 0, 0,  0, 0, 1,  0, 0, 1,  0, 0, 1 },
+      { 1, 0,  1, 0, 0,  1, 0, 0,  1, 0, 0 },
+      { 1, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0 },
+      { 1, 0,  0, 0, 1,  0, 0, 1,  0, 0, 1 },
 
-      { 0, 0, 1, 0, 0, 0,  1, 1, 0,  1, 0, 0,  0, 0, 0 },  
-      { 0, 0, 1, 0, 0, 0,  0, 1, 1,  0, 1, 0,  0, 0, 0 },  
-      { 0, 0, 1, 0, 0, 0,  0, 0, 0,  1, 1, 0,  1, 0, 0 },  
-      { 0, 0, 1, 0, 0, 0,  0, 0, 0,  0, 1, 1,  0, 1, 0 },  
+      { 0, 1,  1, 1, 0,  1, 0, 0,  0, 0, 0 },  
+      { 0, 1,  0, 1, 1,  0, 1, 0,  0, 0, 0 },  
+      { 0, 1,  0, 0, 0,  1, 1, 0,  1, 0, 0 },  
+      { 0, 1,  0, 0, 0,  0, 1, 1,  0, 1, 0 },  
 
-      { 0, 0, 0, 1, 0, 0,  1, 1, 0,  0, 1, 0,  0, 0, 0 },  
-      { 0, 0, 0, 1, 0, 0,  0, 1, 1,  0, 0, 1,  0, 0, 0 },  
-      { 0, 0, 0, 1, 0, 0,  0, 0, 0,  1, 1, 0,  0, 1, 0 },  
-      { 0, 0, 0, 1, 0, 0,  0, 0, 0,  0, 1, 1,  0, 0, 1 },  
+      { 0, 1,  1, 1, 0,  0, 1, 0,  0, 0, 0 },  
+      { 0, 1,  0, 1, 1,  0, 0, 1,  0, 0, 0 },  
+      { 0, 1,  0, 0, 0,  1, 1, 0,  0, 1, 0 },  
+      { 0, 1,  0, 0, 0,  0, 1, 1,  0, 0, 1 },  
 
-      { 0, 0, 0, 0, 1, 0,  0, 1, 0,  1, 1, 0,  0, 0, 0 },  
-      { 0, 0, 0, 0, 1, 0,  0, 0, 1,  0, 1, 1,  0, 0, 0 },  
-      { 0, 0, 0, 0, 1, 0,  0, 0, 0,  0, 1, 0,  1, 1, 0 },  
-      { 0, 0, 0, 0, 1, 0,  0, 0, 0,  0, 0, 1,  0, 1, 1 },  
+      { 0, 1,  0, 1, 0,  1, 1, 0,  0, 0, 0 },  
+      { 0, 1,  0, 0, 1,  0, 1, 1,  0, 0, 0 },  
+      { 0, 1,  0, 0, 0,  0, 1, 0,  1, 1, 0 },  
+      { 0, 1,  0, 0, 0,  0, 0, 1,  0, 1, 1 },  
 
-      { 0, 0, 0, 0, 0, 1,  1, 0, 0,  1, 1, 0,  0, 0, 0 },  
-      { 0, 0, 0, 0, 0, 1,  0, 1, 0,  0, 1, 1,  0, 0, 0 },  
-      { 0, 0, 0, 0, 0, 1,  0, 0, 0,  1, 0, 0,  1, 1, 0 },  
-      { 0, 0, 0, 0, 0, 1,  0, 0, 0,  0, 1, 0,  0, 1, 1 }
+      { 0, 1,  1, 0, 0,  1, 1, 0,  0, 0, 0 },  
+      { 0, 1,  0, 1, 0,  0, 1, 1,  0, 0, 0 },  
+      { 0, 1,  0, 0, 0,  1, 0, 0,  1, 1, 0 },  
+      { 0, 1,  0, 0, 0,  0, 1, 0,  0, 1, 1 }
    };
 
    Shape *temp;

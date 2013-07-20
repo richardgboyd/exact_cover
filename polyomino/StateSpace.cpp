@@ -23,6 +23,9 @@ void StateSpace::setBoard(Board const &_board)
 void StateSpace::addShape(Shape *shape)
 {
     shapes.push_back(shape);
+
+   if (shape->getIndex() >= maxShapeIndex)
+      maxShapeIndex = shape->getIndex() + 1;
 }
 
 
@@ -36,27 +39,27 @@ Shape *StateSpace::getShapeAt(int index)
     return NULL;
 }
 
-int *StateSpace::getNewRow(int index)
+int *StateSpace::getNewRow(Shape *shape)
 {
     int i;
     int *stateSpaceRow; 
     int boardSize = board.getMaxCols() * board.getMaxRows();
 
-    stateSpaceRow = new int[shapes.size() + boardSize];
+    stateSpaceRow = new int[maxShapeIndex + boardSize];
 
-    for (i = 0; i < ((int)shapes.size() + boardSize); i++)
+    for (i = 0; i < (maxShapeIndex + boardSize); i++)
         stateSpaceRow[i] = 0;
 
-    stateSpaceRow[index] = 1;
+    stateSpaceRow[shape->getIndex()] = 1;
 
     return stateSpaceRow;
 }
 
-int StateSpace::mapShape(int index)
+int StateSpace::mapShape(Shape *shape)
 {
    int row, col, startingRows;
    bool shapeMapped;
-   int *stateSpaceRow = getNewRow(index);
+   int *stateSpaceRow = getNewRow(shape);
 
    startingRows = stateRows.size();
    for (row = 0; row < board.getMaxRows(); row++)
@@ -64,12 +67,12 @@ int StateSpace::mapShape(int index)
       for (col = 0; col < board.getMaxCols(); col++)
       {
          shapeMapped = board.mapShapeAt(
-               col, row, *shapes[index], &stateSpaceRow[shapes.size()]);
+               col, row, *shape, &stateSpaceRow[maxShapeIndex]);
 
          if (shapeMapped)
          {
             stateRows.push_back(stateSpaceRow);
-            stateSpaceRow = getNewRow(index);
+            stateSpaceRow = getNewRow(shape);
          }
            
       }
@@ -86,7 +89,7 @@ void StateSpace::mapAllShapes(void)
 
     for (i = 0; i < (int)shapes.size(); i++)
     {
-        mapShape(i);
+        mapShape(shapes[i]);
     }
 }
 
@@ -94,7 +97,7 @@ void StateSpace::displayState(void)
 {
    int i, j, size;
 
-   size = getShapeCount() + (board.getMaxCols() * board.getMaxRows());
+   size = maxShapeIndex + (board.getMaxCols() * board.getMaxRows());
 
    for (i = 0; i < stateRows.size(); i++)
    {
@@ -105,4 +108,6 @@ void StateSpace::displayState(void)
 
       printf("\n");
    }
+
+   printf("\n");
 }

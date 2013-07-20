@@ -121,6 +121,7 @@ void Shape::rotateTo(Shape *newShape)
       newShape->setCell(Cell(col, row), index);
    }
 
+   newShape->setIndex(getIndex());
    newShape->normalize(normalizeCol, normalizeRow);
 }
 
@@ -149,9 +150,13 @@ void Shape::reflectTo(Shape *newShape)
       newShape->setCell(Cell(col, getCell(index).getRow()), index);
    }
 
+   newShape->setIndex(getIndex());
    newShape->normalize(normalizeCol, 0);
 }
 
+/*******************************************************************************
+   Biomino rotate and transform operations
+*******************************************************************************/
 int Biomino::colRotateTransform[]  = { 1,  0,  0, -1 };
 int Biomino::rowRotateTransform[]  = { 0,  1, -1,  0 };
 Shape *Biomino::rotate(void)
@@ -170,17 +175,20 @@ Shape *Biomino::reflect(void)
    return biomino;
 }
 
+/*******************************************************************************
+   Teriomino rotate and transform operations
+*******************************************************************************/
 int Triomino::colRotateTransform[] = {  
       2,  1,  0, 
       1,  0, -1,
       0, -1, -2 
-};
+      };
 
 int Triomino::rowRotateTransform[] = { 
       0,  1,  2,
      -1,  0,  1,
       0, -1, -2 
-};
+      };
 
 Shape *Triomino::rotate(void)
 {
@@ -193,7 +201,7 @@ int Triomino::colReflectTransform[] = {
       2,  0, -2,
       2,  0, -2,
       2,  0, -2 
-};
+      };
 
 Shape *Triomino::reflect(void)
 {
@@ -202,3 +210,41 @@ Shape *Triomino::reflect(void)
    return triomino;
 }
 
+
+/*******************************************************************************
+   Tetromino rotate and transform operations
+*******************************************************************************/
+int Tetromino::colRotateTransform[] = {  
+      3,  2,  1,  0, 
+      2,  1, -1, -2,
+     -2, -1,  1,  2,
+      0, -1, -2, -3
+      };
+
+int Tetromino::rowRotateTransform[] = { 
+      0,  1,  2,  3,
+     -2, -1,  1,  2,
+      2,  1, -1, -2,
+      0, -1, -2, -3
+      };
+
+Shape *Tetromino::rotate(void)
+{
+   Tetromino *tetromino = new Tetromino;
+   rotateTo(tetromino);
+   return tetromino;
+}
+
+int Tetromino::colReflectTransform[] = {  
+      2,  1, -1, -2,
+      2,  1, -1, -2,
+      2,  1, -1, -2,
+      2,  1, -1, -2 
+};
+
+Shape *Tetromino::reflect(void)
+{
+   Tetromino *tetromino = new Tetromino;
+   reflectTo(tetromino);
+   return tetromino;
+}

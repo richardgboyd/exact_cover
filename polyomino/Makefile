@@ -9,14 +9,19 @@ CPPFLAGS += -I$(GTEST_DIR)/include
 CXXFLAGS += -g -Wall -Wextra -DUNIT_TEST
 
 TESTS = testCell.exe testShapes.exe testBoard.exe testStateSpace.exe
+STATES = TetrominoState.exe
 
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
 
-all : $(TESTS)
+all : $(TESTS) $(STATES)
 
 clean :
 	rm -f $(TESTS) gtest.a gtest_main.a *.o
+
+tests : $(TESTS)
+
+states : $(STATES)
 
 GTEST_PATH = ../gtest-1.6.0
 GTEST_INCLUDE = $(GTEST_PATH)/include
@@ -61,4 +66,7 @@ testStateSpace.exe : testStateSpace.o StateSpace.o Board.o Shapes.o gtest.a gtes
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
 
 Triomino.exe : Triomino.o StateSpace.o Board.o Shapes.o
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+Tetromino.exe : Tetromino.o StateSpace.o Board.o Shapes.o
 	$(CXX) $(CXXFLAGS) $^ -o $@

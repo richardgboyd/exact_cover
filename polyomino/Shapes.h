@@ -43,16 +43,29 @@ private:
 
 class Shape
 {
+protected:
+   static int masterIndex;
+
 public:
-  Shape(int _size) { 
+  Shape(int _size, bool setIndex = false) { 
       size = _size; 
       maxCols = 0;
       maxRows = 0;
       cells = new Cell[size]; 
+
+      if (setIndex == true)
+         index = Shape::masterIndex++;
+      else
+         index = -1;
    }
    virtual ~Shape() { delete[] cells; }
 
    int getSize(void) { return size; }
+
+   int getMaxCol(void) { return maxCols; }
+   int getMaxRow(void) { return maxRows; }
+
+   int getIndex(void) { return index; }
 
    Cell &getCell(int index); 
    void setCell(Cell const &cell, int index);
@@ -64,8 +77,7 @@ public:
 #if !defined(UNIT_TEST)
 protected:
 #endif
-   int getMaxCol(void) { return maxCols; }
-   int getMaxRow(void) { return maxRows; }
+   void setIndex(int _index) { index = _index; }
 
    void normalize(int normalizeCol, int normalizeRow);
 
@@ -78,6 +90,10 @@ protected:
    virtual int getColReflectTransform(int index) = 0;
    //virtual int getRowReflectTransform(void);
 
+#if defined(UNIT_TEST)
+   static void resetMasterIndex(void) { masterIndex = 0; }
+#endif
+
 private:
    bool inRange(int index);
 
@@ -89,6 +105,7 @@ private:
    int  size;
    int  maxCols;
    int  maxRows;
+   int  index;
    Cell *cells;
 };
 
@@ -101,7 +118,7 @@ public:
    Biomino():Shape(BIOMINO_SIZE) { };
    Biomino(
          Cell const &loc0, 
-         Cell const &loc1) : Shape(BIOMINO_SIZE) 
+         Cell const &loc1) : Shape(BIOMINO_SIZE, true) 
    {
       setCell(loc0, 0);
       setCell(loc1, 1);
@@ -138,7 +155,7 @@ public:
    Triomino(
          Cell const &loc0, 
          Cell const &loc1, 
-         Cell const &loc2) : Shape(TRIOMINO_SIZE) 
+         Cell const &loc2) : Shape(TRIOMINO_SIZE, true) 
    {
       setCell(loc0, 0);
       setCell(loc1, 1);
@@ -166,17 +183,17 @@ protected:
    //virtual int getRowReflectTransform(void) { return rowReflectTransform; }
 };
 
-class Quadomino : public Shape
+class Tetromino : public Shape
 {
-#define QUADOMINO_SIZE (4)
+#define TETROMINO_SIZE (4)
 
 public:
-   Quadomino():Shape(QUADOMINO_SIZE) { };
-   Quadomino(
+   Tetromino():Shape(TETROMINO_SIZE) { };
+   Tetromino(
          Cell const &loc0, 
          Cell const &loc1, 
          Cell const &loc2,
-         Cell const &loc3) : Shape(QUADOMINO_SIZE) 
+         Cell const &loc3) : Shape(TETROMINO_SIZE, true) 
    {
       setCell(loc0, 0);
       setCell(loc1, 1);
@@ -186,6 +203,23 @@ public:
 
    virtual Shape *rotate(void);
    virtual Shape *reflect(void);
+
+protected:
+   static int colRotateTransform[TETROMINO_SIZE * TETROMINO_SIZE];
+   static int rowRotateTransform[TETROMINO_SIZE * TETROMINO_SIZE];
+
+   static int colReflectTransform[TETROMINO_SIZE * TETROMINO_SIZE];
+   //static int rowReflectTransform[TETROMINO_SIZE * TRIOMINO_SIZE];
+
+protected:
+   virtual int getColRotateTransform(int index) 
+      { return colRotateTransform[index]; }
+   virtual int getRowRotateTransform(int index) 
+      { return rowRotateTransform[index]; }
+
+   virtual int getColReflectTransform(int index) 
+      { return colReflectTransform[index]; }
+   //virtual int getRowReflectTransform(void) { return rowReflectTransform; }
 };
 
 
@@ -200,7 +234,7 @@ public:
          Cell const &loc1, 
          Cell const &loc2,
          Cell const &loc3,
-         Cell const &loc4) : Shape(PENTOMINO_SIZE) 
+         Cell const &loc4) : Shape(PENTOMINO_SIZE, true) 
    {
       setCell(loc0, 0);
       setCell(loc1, 1);
