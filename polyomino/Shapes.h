@@ -54,7 +54,7 @@ public:
       cells = new Cell[size]; 
 
       if (setIndex == true)
-         index = Shape::masterIndex++;
+         index = masterIndex++;
       else
          index = -1;
    }

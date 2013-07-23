@@ -36,6 +36,8 @@ Cell &Cell::transform(void)
    return *this;
 }
 
+int Shape::masterIndex = 0;
+
 void Shape::display(bool emitNewline)
 {
    int i;

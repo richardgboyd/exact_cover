@@ -172,7 +172,7 @@ TEST_F(TriominoTest, assignedDimension)
 TEST_F(TriominoTest, multipleConstruction)
 {
    Triomino triominoX(Cell(0,0), Cell(1,1), Cell(2,2));
-   Triomino triominoV(Cell(0,0), Cell(1,0), Cell(1,0));
+   Triomino triominoV(Cell(0,0), Cell(1,0), Cell(1,1));
    
    ASSERT_EQ(triominoX.getIndex(), 0);
    ASSERT_EQ(triominoX.getMaxCol(), 3);
@@ -235,7 +235,6 @@ TEST_F(TriominoTest, rotateTriominoV)
    ASSERT_EQ(triomino.getMaxRow(), 2);
 
    transformation = triomino.rotate();
-   transformation->display(true);
    ASSERT_EQ(transformation->getMaxCol(), 2);
    ASSERT_EQ(transformation->getMaxRow(), 2);
    ASSERT_EQ(transformation->getIndex(), triomino.getIndex());

@@ -9,7 +9,7 @@ CPPFLAGS += -I$(GTEST_DIR)/include
 CXXFLAGS += -g -Wall -Wextra -DUNIT_TEST
 
 TESTS = testCell.exe testShapes.exe testBoard.exe testStateSpace.exe
-STATES = TetrominoState.exe
+STATES = Triomino.exe Tetromino.exe
 
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
