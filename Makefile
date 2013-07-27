@@ -5,8 +5,8 @@
 GTEST_DIR = ../gtest-1.6.0
 USER_DIR = .
 
-CPPFLAGS += -I$(GTEST_DIR)/include
-CXXFLAGS += -g -Wall -Wextra -DUNIT_TEST
+CXXFLAGS += -I$(GTEST_DIR)/include
+CPPFLAGS += -g -Wall -Wextra -DUNIT_TEST
 
 TESTS = testDList testExactCover
 
@@ -57,9 +57,5 @@ testDList : testDList.o gtest.a gtest_main.a
 testExactCover : testExactCover.o exact_cover.o gtest.a gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
 
-testBoard.exe : testBoard.o Board.o Shapes.o gtest.a gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
-
-testStateSpace.exe : testStateSpace.o StateSpace.o Board.o Shapes.o gtest.a gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
-
+TriominoCover : TriominoCover.o exact_cover.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
