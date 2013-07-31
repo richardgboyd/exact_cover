@@ -59,3 +59,6 @@ testExactCover : testExactCover.o exact_cover.o gtest.a gtest_main.a
 
 TriominoCover : TriominoCover.o exact_cover.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
+
+TetrominoCover : TetrominoCover.o exact_cover.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
