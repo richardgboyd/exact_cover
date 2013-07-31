@@ -201,6 +201,14 @@ public:
       setCell(loc3, 3);
    }
 
+   Tetromino(Tetromino *tetromino) : Shape(TETROMINO_SIZE, true) 
+   {
+      setCell(tetromino->getCell(0), 0);
+      setCell(tetromino->getCell(1), 1);
+      setCell(tetromino->getCell(2), 2);
+      setCell(tetromino->getCell(3), 3);
+   }
+
    virtual Shape *rotate(void);
    virtual Shape *reflect(void);
 
