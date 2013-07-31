@@ -11,3 +11,6 @@
 *.lai
 *.la
 *.a
+
+# Completed executables
+*.exe
