@@ -62,3 +62,10 @@ TriominoCover : TriominoCover.o exact_cover.o
 
 TetrominoCover : TetrominoCover.o exact_cover.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
+
+Tetromino5x8Cover : Tetromino5x8Cover.o exact_cover.o Tetromino5x8.data
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
+
+Tetromino5x8.data : 
+	./polyimno/Tetromino5x8.exe > $@
+
