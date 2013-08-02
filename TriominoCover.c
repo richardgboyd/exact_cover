@@ -1,13 +1,10 @@
 #include "exact_cover.h"
-
-#define MAX_COLUMNS  12
-#define MAX_ROWS     38
-#define MAX_DATA     (MAX_COLUMNS * MAX_ROWS)
+#include "TriominoConstants.h"
 
 struct state_space
 {
    struct list_links    head;
-   struct column_object columns[MAX_COLUMNS];
+   struct column_object columns[MAX_COLS];
    struct data_object   datum  [MAX_DATA];
 } triomino_data;
 
@@ -16,44 +13,7 @@ char *columnNames[] = {
 };
 
 int triominoStateSpace[] = {
-   1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 
-   1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 
-   1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 
-   1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 
-   1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 
-   1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 
-   0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 
-   0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 
-   0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 
-   0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 
-   0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 
-   0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 
-   0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 
-   0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 
-   0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 
-   0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 
-   0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 
-   0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 
-   0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 
-   0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 
-   0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 
-   0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 
-   0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 
-   0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 
-   0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 
-   0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 
-   0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 
-   0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 
-   0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 
-   0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 
-   0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 
-   0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 
-   0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 
-   0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 
-   0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 
-   0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 
-   0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 
-   0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 
+   #include "Triomino.data"
 };
 
 void triominoInitializeStateSpace(void)
@@ -62,7 +22,7 @@ void triominoInitializeStateSpace(void)
 
    list_links_initialize(&triomino_data.head); 
 
-   for (i = 0; i < MAX_COLUMNS; i++)
+   for (i = 0; i < MAX_COLS; i++)
       column_object_initialize(&triomino_data.columns[i], (char *)columnNames[i]);
 
    for (i = 0; i < MAX_DATA; i++)
@@ -113,8 +73,10 @@ void triominoConstructStateSpace(
 
 int main(void)
 {
-   struct data_object *output[MAX_COLUMNS];
+   struct data_object *output[MAX_COLS];
    triominoInitializeStateSpace();
-   triominoConstructStateSpace(&triomino_data, &triominoStateSpace[0], MAX_COLUMNS, MAX_ROWS);
+   triominoConstructStateSpace(&triomino_data, &triominoStateSpace[0], MAX_COLS, MAX_ROWS);
    state_space_search(&triomino_data.head, output, 0);
+
+   return 0;
 }

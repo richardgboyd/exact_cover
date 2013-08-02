@@ -57,15 +57,26 @@ testDList : testDList.o gtest.a gtest_main.a
 testExactCover : testExactCover.o exact_cover.o gtest.a gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@ -lpthread 
 
+# Trimino Cover construction
+Triomino : Triomino.data TriominoCover
+
 TriominoCover : TriominoCover.o exact_cover.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
+
+Triomino.data :
+	./polyomino/Triomino.exe > $@
+	bash PolyiminoConstants.sh "Triomino"
 
 TetrominoCover : TetrominoCover.o exact_cover.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
 
-Tetromino5x8Cover : Tetromino5x8Cover.o exact_cover.o Tetromino5x8.data
+# Tetromino5x8 Cover Construction
+Tetromino5x8 : Tetromino5x8.data Tetromino5x8Cover 
+
+Tetromino5x8Cover : Tetromino5x8Cover.o exact_cover.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
 
 Tetromino5x8.data : 
 	./polyimno/Tetromino5x8.exe > $@
+	bash PolyiminoConstants.sh "Tetromino5x8"
 
