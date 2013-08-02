@@ -212,10 +212,9 @@ state_space_search(
    {
       int index;
 
-      printf("Solution:\n");
       for (index = 0; index < k; index++)
-         printf("\"%s:%d\" ", O[index]->column_handle->name, O[index]->id);
-      printf("\n\n");
+         printf("%s:%d ", O[index]->column_handle->name, O[index]->id);
+      printf("\n");
 
       return;
    }
