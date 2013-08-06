@@ -253,6 +253,22 @@ public:
 
    virtual Shape *rotate(void);
    virtual Shape *reflect(void);
+
+protected:
+   static int colRotateTransform[PENTOMINO_SIZE * PENTOMINO_SIZE];
+   static int rowRotateTransform[PENTOMINO_SIZE * PENTOMINO_SIZE];
+
+   static int colReflectTransform[PENTOMINO_SIZE * PENTOMINO_SIZE];
+
+protected:
+   virtual int getColRotateTransform(int index) 
+      { return colRotateTransform[index]; }
+   virtual int getRowRotateTransform(int index) 
+      { return rowRotateTransform[index]; }
+
+   virtual int getColReflectTransform(int index) 
+      { return colReflectTransform[index]; }
+   //virtual int getRowReflectTransform(void) { return rowReflectTransform; }
 };
 
 #endif

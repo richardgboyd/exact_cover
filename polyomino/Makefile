@@ -73,3 +73,6 @@ Tetromino.exe : Tetromino.o StateSpace.o Board.o Shapes.o
 
 Tetromino5x8.exe : Tetromino5x8.o StateSpace.o Board.o Shapes.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
+
+Pentomino.exe : Pentomino.o StateSpace.o Board.o Shapes.o
+	$(CXX) $(CXXFLAGS) $^ -o $@

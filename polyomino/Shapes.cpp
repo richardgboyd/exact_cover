@@ -218,16 +218,16 @@ Shape *Triomino::reflect(void)
 *******************************************************************************/
 int Tetromino::colRotateTransform[] = {  
       3,  2,  1,  0, 
-      2,  1, -1, -2,
-     -2, -1,  1,  2,
+      2,  1,  0, -1,
+     -1,  0, -1, -2,
       0, -1, -2, -3
       };
 
 int Tetromino::rowRotateTransform[] = { 
       0,  1,  2,  3,
-     -2, -1,  1,  2,
-      2,  1, -1, -2,
-      0, -1, -2, -3
+     -1,  0,  1,  2,
+     -2, -1,  0,  1,
+     -3, -2, -1,  0
       };
 
 Shape *Tetromino::rotate(void)
@@ -250,3 +250,46 @@ Shape *Tetromino::reflect(void)
    reflectTo(tetromino);
    return tetromino;
 }
+
+/*******************************************************************************
+   Pentomino rotate and transform operations
+*******************************************************************************/
+int Pentomino::colRotateTransform[] = {  
+      4,  3,  2,  1,  0, 
+      3,  2,  1,  0, -1,
+      2,  1,  0, -1, -2,
+      1,  0, -1, -2, -3,
+      0, -1, -2, -3, -4
+      };
+
+int Pentomino::rowRotateTransform[] = { 
+      0,  1,  2,  3,  4,
+     -1,  0,  1,  2,  3,
+     -2, -1,  0,  1,  2,
+     -3, -2, -1,  0,  1,
+     -4, -3, -2, -1,  0
+      };
+
+Shape *Pentomino::rotate(void)
+{
+   Pentomino *tentomino = new Pentomino;
+   rotateTo(tentomino);
+   return tentomino;
+}
+
+int Pentomino::colReflectTransform[] = {  
+      4,  2,  0, -2, -4,
+      4,  2,  0, -2, -4,
+      4,  2,  0, -2, -4,
+      4,  2,  0, -2, -4,
+      4,  2,  0, -2, -4 
+};
+
+Shape *Pentomino::reflect(void)
+{
+   Pentomino *tentomino = new Pentomino;
+   reflectTo(tentomino);
+   return tentomino;
+}
+
+
